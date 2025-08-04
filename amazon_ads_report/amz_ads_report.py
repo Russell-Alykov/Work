@@ -1,5 +1,3 @@
-# AttributeError: 'Engine' object has no attribute 'cursor'
-
 import pandas as pd
 import json
 import requests
