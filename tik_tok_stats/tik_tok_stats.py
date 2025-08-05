@@ -343,7 +343,7 @@ def notify_email(context):
 	task_id = context.get('task_instance').task_id
 	subject = "tik_tok_stats.py failure"  # Тема письма – название скрипта
 	message = f"Задача {task_id} завершилась с ошибкой:\n{exception}"
-	send_email("analytics-scripts-reports@therockapp.com", subject, message)
+	send_email("analytics-scripts-reports@example.com", subject, message)
 
 # ------------------------------------------------------------------------------
 # Функции для задач DAG
