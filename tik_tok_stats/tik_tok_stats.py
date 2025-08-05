@@ -412,7 +412,7 @@ moscow_tz = pendulum.timezone("Europe/Moscow")
 default_args = {
     'owner': 'airflow',
     'start_date': pendulum.datetime(2025, 1, 1, tz="Europe/Moscow"),
-    'email': ['analytics-scripts-reports@therockapp.com'],
+    'email': ['analytics-scripts-reports@example.com'],
     'email_on_failure': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
