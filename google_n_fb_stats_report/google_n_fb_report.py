@@ -39,7 +39,7 @@ sh = gp.open_by_url(gs_product_dict)
 name_worksheet = gs_product_dict_sheet
 worksheet = sh.worksheet(name_worksheet)
 data = worksheet.get_all_values()
-headers = data.pop(0)  # удаляем заголовки из данных и сохраняем их отдельно (pandas не дает выгрузить столбцы с одинаковым названием)
+headers = data.pop(0)
 
 def get_all_dict(name_worksheet):
     try:
@@ -69,8 +69,6 @@ def get_all_dict(name_worksheet):
         # Выбираем нужные колонки и заполняем отсутствующие значения
         df = df[required_columns]
         df['asin'] = df['asin'].fillna('Не определен')
-        
-        # Возвращаем результат
         return df
     
     except Exception as e:
@@ -273,9 +271,8 @@ engine.execute(query)
 ################################################
 db_connection.close()
 
-# Замена пустых строк на None (NaN) в числовых колонках
+# Замена пустых значений на None (NaN) в числовых колонках
 df_g_shop.replace('', None, inplace=True)
-# Или если вы работаете с pandas:
 df_g_shop['metrics.ctr'] = df_g_shop['metrics.ctr'].replace('', None)
 
 # Запись в БД dwh
