@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #---------TITLE----------------
-# okta_nails_to_db
+# fraud_mails_to_db
 #---------DESCRIPTION----------
-# Выгружает редирект почты okta с analytics-data-aggregator@rrgroup.solutions
+# Выгружает редирект почты с analytics-data-aggregator@example.com
 # удаляет фрод данные из файла конверсий по AppsFlyer_ID
-# грузит финальный результат в public.no_fraud_okta_mail_redirect (хранение прошлый месяц + текущий),
-# а так же врменно (6 дней) сгружает фрод в public.temporary_fraud_okta_mails
+# грузит финальный результат в public.no_fraud_mail_redirect (хранение прошлый месяц + текущий),
+# а так же врменно (6 дней) сгружает фрод в public.temporary_fraud_mails
 #------------------------------ 
 
 import warnings
@@ -32,7 +32,7 @@ from googleapiclient.discovery import build
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Чтение переменных среды
-load_dotenv('/home/analyst/analyst_dev/rr_alykov/scripts/okta_fraud_mails_to_db/.env')
+load_dotenv('/home/analyst/analyst_dev/rr_alykov/scripts/fraud_mails_to_db/.env')
 
 # SQL
 base_db = os.getenv('BASE_DB')
@@ -46,8 +46,8 @@ TOKEN_FILE = os.getenv('TOKEN_FILE')
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 DB_CONNECTION_STRING = f'postgresql://{user}:{password}@{ip}:{port}/{base_db}'
 # Названия таблиц в БД
-TEMP_FRAUD_TABLE = 'temporary_fraud_okta_mails'
-NO_FRAUD_TABLE = 'no_fraud_okta_mail_redirect'
+TEMP_FRAUD_TABLE = 'temporary_fraud_mails'
+NO_FRAUD_TABLE = 'no_fraud_mail_redirect'
 
 # Словарь переименования столбцов для итогового DataFrame.
 # Обратите внимание: если входной файл содержит столбец county_code вместо country_code,
@@ -328,7 +328,7 @@ def update_no_fraud_data_final(df_final, engine, table_name=NO_FRAUD_TABLE, sche
 	with engine.begin() as conn:
 		conn.execute(text(
 			"""CREATE UNIQUE INDEX IF NOT EXISTS idx_no_fraud_unique
-			   ON public.no_fraud_okta_mail_redirect ("AppsFlyer_ID", date)"""
+			   ON public.no_fraud_mail_redirect ("AppsFlyer_ID", date)"""
 		))
 
 	meta = MetaData()
@@ -407,7 +407,7 @@ def main():
 
 		# 7) Очищаем итоговую таблицу по всем фродовым ID
 		delete_query = text(f"""
-			DELETE FROM public.no_fraud_okta_mail_redirect
+			DELETE FROM public.no_fraud_mail_redirect
 			WHERE lower("AppsFlyer_ID") IN (
 				SELECT lower(appsflyer_id)
 				FROM public.{TEMP_FRAUD_TABLE}
@@ -423,7 +423,7 @@ def main():
 
 	# Финальная очистка после обработки (на случай, если фрод-файлы поступят с опозданием)
 	final_delete_query = text(f"""
-		DELETE FROM public.no_fraud_okta_mail_redirect
+		DELETE FROM public.no_fraud_mail_redirect
 		WHERE lower("AppsFlyer_ID") IN (
 			SELECT lower(appsflyer_id)
 			FROM public.{TEMP_FRAUD_TABLE}
